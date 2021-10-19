@@ -1,3 +1,4 @@
+from re import template
 from flask import Flask, request,render_template
 from flask_sqlalchemy import SQLAlchemy, request
 from email import message
@@ -92,6 +93,8 @@ def validateotp(rollno):
         emaildb = data.email
         mathmark=data.math_marks
 
+        render_template('resultdata.html',data=data)
+
         userotp = request.form['otp']
         if otp == int(userotp):
 
@@ -100,6 +103,8 @@ def validateotp(rollno):
             msg['From'] = 'resultservertest@gmail.com'
             msg['To'] = emaildb
             msg.set_content(str(mathmark))
+            html_msg = open('templates/resultdata.html').read()
+            msg.add_alternative(html_msg, subtype='html')
 
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
                 smtp.login('resultservertest@gmail.com', os.environ.get('PASS'))
