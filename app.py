@@ -1,9 +1,10 @@
-from flask import Flask, jsonify, request,render_template
+from flask import Flask, request,render_template
 from flask_sqlalchemy import SQLAlchemy, request
 from email import message
 import os
 import smtplib
 from email.message import EmailMessage
+import random
 
 
 app = Flask(__name__)
@@ -21,6 +22,14 @@ class Student(db.Model):
     science_marks = db.Column(db.Integer())
     english_marks = db.Column(db.Integer())
 
+otp = random.randint(0000,9999)
+
+
+def validate(userotp):
+    if otp == int(userotp):
+        return True
+    
+
 
 
 @app.route("/", methods=['GET','POST'])
@@ -29,7 +38,7 @@ def test():
         # details = request.form
         # rollno = details['rollno']
         rollno = request.form['rollno']
-        data = Student.query.get(rollno)
+        data = Student.query.get_or_404(rollno,description="student does not exist")
 
         emaildb = data.email
            
@@ -45,20 +54,62 @@ def test():
 
             
 
+        # msg = EmailMessage()
+        # msg['Subject'] = 'Mail from akash server'
+        # msg['From'] = 'resultservertest@gmail.com'
+        # msg['To'] = emaildb
+        # msg.set_content('This is proper email with body')
+
+        # with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+        #     smtp.login('resultservertest@gmail.com', os.environ.get('PASS'))
+                
+        #     smtp.send_message(msg)
+
+        # return "Check your Email for the result"
+
+
         msg = EmailMessage()
-        msg['Subject'] = 'Mail from akash server'
+        msg['Subject'] = 'OTP FROM Akash Server'
         msg['From'] = 'resultservertest@gmail.com'
         msg['To'] = emaildb
-        msg.set_content('This is proper email with body')
+        msg.set_content(str(otp))
 
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
             smtp.login('resultservertest@gmail.com', os.environ.get('PASS'))
                 
             smtp.send_message(msg)
 
-        return "Check your Email for the result"
+        return render_template("validateotp.html",rollno = rollno)
 
     return render_template("home.html")
+
+
+@app.route("/validateotp/<int:rollno>", methods=['POST'])
+def validateotp(rollno):
+    if request.method == 'POST':
+
+        data = Student.query.get(rollno)
+        emaildb = data.email
+        mathmark=data.math_marks
+
+        userotp = request.form['otp']
+        if otp == int(userotp):
+
+            msg = EmailMessage()
+            msg['Subject'] = 'Mail from akash server'
+            msg['From'] = 'resultservertest@gmail.com'
+            msg['To'] = emaildb
+            msg.set_content(str(mathmark))
+
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+                smtp.login('resultservertest@gmail.com', os.environ.get('PASS'))
+                
+                smtp.send_message(msg)
+
+            return "Check your Email for the result"
+        return render_template("home.html", msg = "Otp not verified")
+
+ 
 
 
 
