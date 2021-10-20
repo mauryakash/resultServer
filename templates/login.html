@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <h1>Admin Login</h1>
+
+    <form method="post" action="">
+        <label for="username">Enter Username</label> 
+        <input type="text" name="username" required>
+        <br>
+        <label for="password">Enter password</label> 
+        <input type="password" name="password" required>
+
+        <input type="submit" class="btn btn-success" name="submit"></button>
+    </form>
+
+    {% if failed %}
+    <div>
+      <p><strong>Incorrect Username or Password</strong></p>
+
+    </div>
+    {% endif %}
+
+{% endblock %}

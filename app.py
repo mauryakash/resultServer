@@ -1,17 +1,20 @@
-from re import template
-from flask import Flask, request,render_template
+from flask import Flask, request,render_template,session,redirect
 from flask_sqlalchemy import SQLAlchemy, request
-from email import message
 import os
 import smtplib
 from email.message import EmailMessage
 import random
+from flask_admin import Admin #admin
+from flask_admin.contrib.sqla import ModelView #admin
+from werkzeug.exceptions import abort #admin
 
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Ram#12345@localhost/result'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = "secretkey1" #admin
 db = SQLAlchemy(app)
+admin = Admin(app) #admin
 
 
 class Student(db.Model):
@@ -23,9 +26,22 @@ class Student(db.Model):
     science_marks = db.Column(db.Integer())
     english_marks = db.Column(db.Integer())
 
-otp = random.randint(0000,9999)
+otp = random.randint(1111,9999)
+
+#-----------------------------------Admin --------------------------------
+
+class SecureModelView(ModelView):
+    def is_accessible(self):
+        if "logged_in" in session:
+            return True
+        else:
+            abort(403)
 
 
+admin.add_view(SecureModelView(Student,db.session))
+
+
+#------------------------------------------------------------------------------
 def validate(userotp):
     if otp == int(userotp):
         return True
@@ -54,21 +70,6 @@ def test():
         # server.sendmail("resultservertest@gmail.com", emaildb , message)
 
             
-
-        # msg = EmailMessage()
-        # msg['Subject'] = 'Mail from akash server'
-        # msg['From'] = 'resultservertest@gmail.com'
-        # msg['To'] = emaildb
-        # msg.set_content('This is proper email with body')
-
-        # with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-        #     smtp.login('resultservertest@gmail.com', os.environ.get('PASS'))
-                
-        #     smtp.send_message(msg)
-
-        # return "Check your Email for the result"
-
-
         msg = EmailMessage()
         msg['Subject'] = 'OTP FROM Akash Server'
         msg['From'] = 'resultservertest@gmail.com'
@@ -92,8 +93,9 @@ def validateotp(rollno):
         data = Student.query.get(rollno)
         emaildb = data.email
         mathmark=data.math_marks
+        engmark=data.english_marks
 
-        render_template('resultdata.html',data=data)
+        html = render_template('resultdata.html',data=data)
 
         userotp = request.form['otp']
         if otp == int(userotp):
@@ -102,8 +104,9 @@ def validateotp(rollno):
             msg['Subject'] = 'Mail from akash server'
             msg['From'] = 'resultservertest@gmail.com'
             msg['To'] = emaildb
-            msg.set_content(str(mathmark))
-            html_msg = open('templates/resultdata.html').read()
+            # msg.set_content(html)
+            html_msg = html
+            # html_msg = open('templates/resultdata.html').read()
             msg.add_alternative(html_msg, subtype='html')
 
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
@@ -111,11 +114,36 @@ def validateotp(rollno):
                 
                 smtp.send_message(msg)
 
-            return "Check your Email for the result"
+            return render_template("validateotp.html",message="Check your mail for the result")
         return render_template("home.html", msg = "Otp not verified")
 
- 
+ #------------------------------------------------------------------------------------------------
+ #-----------------------------------------Admin---------------------------------------------------
+ #-------------------------------------------------------------------------------------------------
 
+
+# @app.route("/admin", methods=['GET','POST'])
+# def admin():
+#     return render_template("admin.html")
+
+@app.route("/login", methods=["GET","POST"])
+def login():
+    if request.method == "POST":
+        if request.form.get("username") == "test" and request.form.get("password") == "test":
+            session['logged_in'] = True
+            return redirect("/admin")
+        else:
+            return render_template("login.html", failed = True)
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
+
+
+#----------------------------------------------------------------------------------------
 
 
 if __name__ == '__main__':

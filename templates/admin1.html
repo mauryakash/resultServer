@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+
+
+{% block content %}
+  <h1>ADMIN PANEL</h1>
+
+  <form method="post" action="">
+      <table>
+    <tr>    
+        <td> 
+    <label for="Register_Student">Register New Student</label>
+        </td>
+        <td>
+    <input type="submit" class="btn btn-success" name="register"></button>
+        </td>
+    </tr>   
+    <tr>
+        <td>
+    <label for="Update_Student">Enter Roll no to update result</label>
+        </td>
+        <td>
+    <input type="number" name="rollno"> 
+        </td>
+        <td>
+    <input type="submit" class="btn btn-success" name="update"></button>
+        </td>
+    </tr>
+    <tr>
+        <td>
+    <label for="delete_Student">Enter Roll no : to delete student</label></td>
+        <td>
+    <input type="number" name="rollno">
+        </td>
+        <td>
+    <input type="submit" class="btn btn-success" name="update"></button>
+        </td>
+    </tr>
+    </table>
+
+  </form>
+
+
+{% endblock %}
