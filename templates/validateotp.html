@@ -3,7 +3,22 @@
 
 
 {% block content %}
-  <h1>OTP VALIDATION PAGE</h1>
+
+
+<nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+  <div class="container-fluid">
+    <a class="navbar-brand">Fynd-Result</a>
+  </div>
+</nav>
+
+<br>
+<br>
+<br>
+<h1><center><u>OTP VALIDATION PAGE</u></center></h1>
+<br>
+<br>
+<br>
+<div class="p-3 mb-2 bg-dark text-white">
 
     <form method="post" action="http://localhost:5000/validateotp/{{rollno}}">
 
@@ -16,5 +31,5 @@
         <p><strong>{{message}}</strong></p>
   
       </div>
-
+    </div>
 {% endblock %}

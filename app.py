@@ -4,9 +4,10 @@ import os
 import smtplib
 from email.message import EmailMessage
 import random
-from flask_admin import Admin #admin
-from flask_admin.contrib.sqla import ModelView #admin
-from werkzeug.exceptions import abort #admin
+from flask_admin import Admin   #admin
+from flask_admin.contrib.sqla import ModelView    #admin
+from werkzeug.exceptions import abort    #admin
+import imghdr #Image type
 
 
 app = Flask(__name__)
@@ -26,7 +27,6 @@ class Student(db.Model):
     science_marks = db.Column(db.Integer())
     english_marks = db.Column(db.Integer())
 
-otp = random.randint(1111,9999)
 
 #-----------------------------------Admin --------------------------------
 
@@ -42,9 +42,11 @@ admin.add_view(SecureModelView(Student,db.session))
 
 
 #------------------------------------------------------------------------------
-def validate(userotp):
-    if otp == int(userotp):
-        return True
+otp = random.randint(1111,9999)
+
+# def validate(userotp):
+#     if otp == int(userotp):
+#         return True
     
 
 
@@ -92,8 +94,8 @@ def validateotp(rollno):
 
         data = Student.query.get(rollno)
         emaildb = data.email
-        mathmark=data.math_marks
-        engmark=data.english_marks
+        # mathmark=data.math_marks
+        # engmark=data.english_marks
 
         html = render_template('resultdata.html',data=data)
 
@@ -109,14 +111,28 @@ def validateotp(rollno):
             # html_msg = open('templates/resultdata.html').read()
             msg.add_alternative(html_msg, subtype='html')
 
+            with open('static/fynd.jpeg','rb') as attach_file:
+                image_name = attach_file.name
+                image_type = imghdr.what(attach_file.name)
+                image_data = attach_file.read()
+
+            msg.add_attachment(image_data, maintype='image',subtype=image_type,filename=image_name)
+
+
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
                 smtp.login('resultservertest@gmail.com', os.environ.get('PASS'))
                 
                 smtp.send_message(msg)
 
-            return render_template("validateotp.html",message="Check your mail for the result")
+            # return render_template("endpage.html",message="Check your mail for the result")
+            return redirect("/endpage")
         return render_template("home.html", msg = "Otp not verified")
 
+
+
+@app.route("/endpage", methods=['GET'])
+def endpage():
+    return render_template("endpage.html",message="Check your Email for the result")
  #------------------------------------------------------------------------------------------------
  #-----------------------------------------Admin---------------------------------------------------
  #-------------------------------------------------------------------------------------------------

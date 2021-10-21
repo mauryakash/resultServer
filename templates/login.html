@@ -1,7 +1,12 @@
 {% extends "layout.html" %}
 
 {% block content %}
-  <h1>Admin Login</h1>
+
+<h1><center><u>Admin Login</u></center></h1>
+<br>
+<br>
+<br>
+  <div class="p-3 mb-2 bg-dark text-white">
 
     <form method="post" action="">
         <label for="username">Enter Username</label> 
@@ -9,7 +14,7 @@
         <br>
         <label for="password">Enter password</label> 
         <input type="password" name="password" required>
-
+        <br>
         <input type="submit" class="btn btn-success" name="submit"></button>
     </form>
 
@@ -20,4 +25,5 @@
     </div>
     {% endif %}
 
+  </div>
 {% endblock %}

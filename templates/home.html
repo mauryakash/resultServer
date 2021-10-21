@@ -3,8 +3,21 @@
 
 
 {% block content %}
-  <h1>Home page</h1>
 
+<nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+  <div class="container-fluid">
+    <a class="navbar-brand">Fynd-Result</a>
+  </div>
+</nav>
+
+<br>
+<br>
+<br>
+<h1><center><u>Home page</u></center></h1>
+<br>
+<br>
+<br>
+<div class="p-3 mb-2 bg-dark text-white">
     <form method="post" action="http://localhost:5000/">
         <label for="rollno">Enter Roll no :</label> 
         <input type="number" name="rollno" required>
@@ -16,6 +29,6 @@
       <p><strong>{{msg}}</strong></p>
 
     </div>
-
+  </div>
 
 {% endblock %}
