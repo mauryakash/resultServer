@@ -7,22 +7,42 @@ from werkzeug.exceptions import abort    #admin
 main2 = Blueprint('main2', __name__)
 admin = Admin()
 
-#-----------------------admin--------------
-class SecureModelView(ModelView):
-    def is_accessible(self):
-        if "logged_in" in session:
-            return True
-        else:
-            abort(403)
+#-----------------------Flask admin--------------
+# class SecureModelView(ModelView):
+#     def is_accessible(self):
+#         if "logged_in" in session:
+#             return True
+#         else:
+#             abort(403)
 
 
-admin.add_view(SecureModelView(Student,db.session))
+# admin.add_view(SecureModelView(Student,db.session))
 
 #--------------------------------------------------------
 
  #------------------------------------------------------------------------------------------------
- #-----------------------------------------Admin---------------------------------------------------
+ #-----------------------------------------Flask Admin---------------------------------------------------
  #-------------------------------------------------------------------------------------------------
+
+
+# @main2.route("/login", methods=["GET","POST"])
+# def login():
+#     if request.method == "POST":
+#         if request.form.get("username") == "test" and request.form.get("password") == "test":
+#             session['logged_in'] = True
+#             return redirect("/admin")
+#         else:
+#             return render_template("login.html", failed = True)
+#     return render_template("login.html")
+
+
+# @main2.route("/logout")
+# def logout():
+#     session.clear()
+#     return redirect("/")
+
+
+#----------------------------------------------------------------------------------------
 
 
 @main2.route("/login", methods=["GET","POST"])
@@ -30,16 +50,83 @@ def login():
     if request.method == "POST":
         if request.form.get("username") == "test" and request.form.get("password") == "test":
             session['logged_in'] = True
-            return redirect("/admin")
+            return redirect("/myadmin")
         else:
             return render_template("login.html", failed = True)
     return render_template("login.html")
 
 
-@main2.route("/logout")
+@main2.route("/logout" , methods=["POST"])
 def logout():
-    session.clear()
-    return redirect("/")
+    if request.method == "POST":
+        session.pop('logged_in',None)
+        return redirect("/login")
 
 
-#----------------------------------------------------------------------------------------
+
+
+#-------MYAdmin--------------------------------------------------------
+
+@main2.route("/myadmin",methods=['GET','POST'])
+def add():
+    if 'logged_in' in session:
+            
+        if request.method == 'POST':
+            rollno = request.form.get('rollno')
+            name = request.form.get('name')
+            email = request.form.get('email')
+            mobile = request.form.get('mobile')
+            math_marks = request.form.get('math_marks')
+            science_marks = request.form.get('science_marks')
+            english_marks = request.form.get('english_marks')
+
+            stu= Student(rollno=rollno, name=name, email=email, mobile=mobile, math_marks=math_marks, science_marks=science_marks, english_marks=english_marks)
+            db.session.add(stu)
+            db.session.commit()
+
+        alldata = Student.query.all()
+        return render_template("index1.html",alldata=alldata)
+    return redirect('/login')
+
+@main2.route("/update/<int:rollno>" ,methods=['GET','POST'])
+def update(rollno):
+    if 'logged_in' in session:
+
+        if request.method == 'POST':
+            rollno = request.form.get('rollno')
+            name = request.form.get('name')
+            email = request.form.get('email')
+            mobile = request.form.get('mobile')
+            math_marks = request.form.get('math_marks')
+            science_marks = request.form.get('science_marks')
+            english_marks = request.form.get('english_marks')
+            stu = Student.query.filter_by(rollno=rollno).first()
+            # d = Student(stuid=stuid, name=name, email=email, mbno=mbno, mtmarks=mtmarks, scmarks=scmarks,
+            #                 csmarks=csmarks)
+            # db.session.add(d)
+            # db.session.commit()
+            stu.rollno = rollno
+            stu.name = name
+            stu.email = email
+            stu.mobile = mobile
+            stu.math_marks = math_marks
+            stu.science_marks = science_marks
+            stu.english_marks = english_marks
+            db.session.add(stu)
+            db.session.commit()
+            return redirect("/myadmin")
+        stu = Student.query.filter_by(rollno=rollno).first()
+        return render_template('update.html',stu=stu)
+    return redirect('/login')
+
+
+
+@main2.route("/delete/<int:rollno>")
+def delete(rollno):
+    if 'logged_in' in session:
+
+        stu = Student.query.filter_by(rollno=rollno).first()
+        db.session.delete(stu)
+        db.session.commit()
+        return redirect("/myadmin")
+    return redirect('/login')

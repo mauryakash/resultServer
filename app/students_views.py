@@ -1,4 +1,4 @@
-from flask import Blueprint,request,render_template,session,redirect
+from flask import Blueprint,request,render_template,session,redirect,flash
 from .models import Student
 import os
 import smtplib
@@ -55,25 +55,20 @@ def encrypt_pdf(html):
         out.write(f)
 
 def removePdf():
-    return "StudentData_Encrypted.pdf" and "StudentData.pdf"
+        pdfdelete=("StudentData_Encrypted.pdf" , "StudentData.pdf")
+        os.remove(pdfdelete[0])
+        os.remove(pdfdelete[1])
 
 
 
 @main.route("/", methods=['GET','POST'])
 def test():
     if request.method == 'POST':
-        
-        # if 'email' in session: #resend otp
-        #     emaildb = session['email'] #resend otp
-        #     x = generateOtp() #resend otp
-        #     sendOtp(emaildb,x) #resend otp
-        #     rollno = session['email']
-        #     return render_template("validateotp.html",rollno = rollno)
-            
-        #details = request.form
-        # rollno = details['rollno']
         rollno = request.form['rollno']
-        data = Student.query.get_or_404(rollno,description="student does not exist")
+        data = Student.query.get(rollno)
+        if data is None:
+            flash("Please Enter Valid Roll NO", "info")
+            return redirect ('/')
         emaildb = data.email
         session['email'] = (emaildb,rollno) #will store this in session for resend otp
 
@@ -144,8 +139,6 @@ def validateotp(rollno):
                     maintype, subtype = ctype.split('/', 1)
                     msg.add_attachment(pdf_data, maintype=maintype, subtype=subtype, filename='StudentData.pdf')
                     
-                    pdfdelete = removePdf()
-                    os.remove(pdfdelete)
 
                 with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
                     smtp.login('resultservertest@gmail.com', os.environ.get('PASS'))
@@ -162,5 +155,7 @@ def validateotp(rollno):
 
 @main.route("/endpage", methods=['GET'])
 def endpage():
+    #Delete the generated pdf after sending email
+    removePdf()
     return render_template("endpage.html",message="Check your Email for the result")
 
