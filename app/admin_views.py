@@ -1,4 +1,4 @@
-from flask import Blueprint,session,request,render_template,redirect
+from flask import Blueprint,session,request,render_template,redirect,flash
 from .models import Student,db
 from flask_admin import Admin   #admin
 from flask_admin.contrib.sqla import ModelView    #admin
@@ -7,7 +7,7 @@ from werkzeug.exceptions import abort    #admin
 main2 = Blueprint('main2', __name__)
 admin = Admin()
 
-#-----------------------Flask admin--------------
+#-----------------------Flask admin------------------
 # class SecureModelView(ModelView):
 #     def is_accessible(self):
 #         if "logged_in" in session:
@@ -81,6 +81,14 @@ def add():
             english_marks = request.form.get('english_marks')
 
             stu= Student(rollno=rollno, name=name, email=email, mobile=mobile, math_marks=math_marks, science_marks=science_marks, english_marks=english_marks)
+            
+            #This will Work to handle Exception IF again Same data is tried to added
+            rollnodb = Student.query.get(rollno)
+            if rollnodb is not None:
+                flash("Roll No already Exist", "info")
+                return redirect ('/myadmin')
+
+            #Else if No Exception Then Add the data
             db.session.add(stu)
             db.session.commit()
 
@@ -100,11 +108,10 @@ def update(rollno):
             math_marks = request.form.get('math_marks')
             science_marks = request.form.get('science_marks')
             english_marks = request.form.get('english_marks')
+            #object of row of the db related to rollno
             stu = Student.query.filter_by(rollno=rollno).first()
-            # d = Student(stuid=stuid, name=name, email=email, mbno=mbno, mtmarks=mtmarks, scmarks=scmarks,
-            #                 csmarks=csmarks)
-            # db.session.add(d)
-            # db.session.commit()
+
+            #update new data in db
             stu.rollno = rollno
             stu.name = name
             stu.email = email
