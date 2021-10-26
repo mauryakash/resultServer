@@ -1,5 +1,6 @@
 from flask import Blueprint,session,request,render_template,redirect,flash
 from .models import Student,db
+import os
 from flask_admin import Admin   #admin
 from flask_admin.contrib.sqla import ModelView    #admin
 from werkzeug.exceptions import abort    #admin
@@ -48,7 +49,7 @@ admin = Admin()
 @main2.route("/login", methods=["GET","POST"])
 def login():
     if request.method == "POST":
-        if request.form.get("username") == "test" and request.form.get("password") == "test":
+        if request.form.get("username") == "admin" and request.form.get("password") == os.environ.get('PASS'):
             session['logged_in'] = True
             return redirect("/myadmin")
         else:

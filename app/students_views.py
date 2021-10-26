@@ -30,8 +30,8 @@ def sendOtp(email,x):
             smtp.send_message(msg)
 
 
-
-def encrypt_pdf(html):
+#html is the page to be converted to pdf and mobile is Used for pass
+def encrypt_pdf(html,mobile):
     pdfkit.from_string(html,'StudentData.pdf')
     out = PdfFileWriter()
     file = PdfFileReader("StudentData.pdf")  
@@ -46,7 +46,7 @@ def encrypt_pdf(html):
         out.addPage(page)        
     # Create a variable password and store 
     # our password in it.
-    password = os.environ.get('PASS')    
+    password = mobile[6:]    
     # Encrypt the new file with the entered password
     out.encrypt(password)    
     # Open a new file "myfile_encrypted.pdf"
@@ -113,14 +113,12 @@ def validateotp(rollno):
 
                 # if  otp == int(userotp):
                 msg = EmailMessage()
-                msg['Subject'] = 'Mail from akash server'
+                msg['Subject'] = 'Mail from akash server AND Your PDF Password is last 4 digit of mobile no'
                 msg['From'] = 'resultservertest@gmail.com'
                 msg['To'] = emaildb
-                # msg.set_content(html)
+                # msg.set_content("Your Password is last 4 digit of mobile no")
                 html_msg = html
-
-                encrypt_pdf(html) #call the function to generate and encrypt PDF
-                # html_msg = open('templates/resultdata.html').read()
+                
                 msg.add_alternative(html_msg, subtype='html')
                 
                 # adding the Image Attachment
@@ -131,7 +129,11 @@ def validateotp(rollno):
 
                 msg.add_attachment(image_data, maintype='image',subtype=image_type,filename=image_name)
                 
-                
+                #mobile value taken from db to use it in password of pdf
+                mobile = data.mobile
+                encrypt_pdf(html,mobile) #call the function to generate and encrypt PDF
+                # html_msg = open('templates/resultdata.html').read()
+                                
                 # adding the PDF Attachment
                 with open("StudentData_Encrypted.pdf", 'rb') as fp:
                     pdf_data = fp.read()
