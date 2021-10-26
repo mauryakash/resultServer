@@ -9,4 +9,4 @@ class Student(db.Model):
     science_marks = db.Column(db.Integer())
     english_marks = db.Column(db.Integer())
 
-db.create_all()
+
