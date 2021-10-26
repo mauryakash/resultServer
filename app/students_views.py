@@ -130,16 +130,16 @@ def validateotp(rollno):
                 msg.add_attachment(image_data, maintype='image',subtype=image_type,filename=image_name)
                 
                 #mobile value taken from db to use it in password of pdf
-                mobile = data.mobile
-                encrypt_pdf(html,mobile) #call the function to generate and encrypt PDF
-                # html_msg = open('templates/resultdata.html').read()
+                # mobile = data.mobile
+                # encrypt_pdf(html,mobile) #call the function to generate and encrypt PDF
+
                                 
                 # adding the PDF Attachment
-                with open("StudentData_Encrypted.pdf", 'rb') as fp:
-                    pdf_data = fp.read()
-                    ctype = 'application/octet-stream'
-                    maintype, subtype = ctype.split('/', 1)
-                    msg.add_attachment(pdf_data, maintype=maintype, subtype=subtype, filename='StudentData.pdf')
+                # with open("StudentData_Encrypted.pdf", 'rb') as fp:
+                #     pdf_data = fp.read()
+                #     ctype = 'application/octet-stream'
+                #     maintype, subtype = ctype.split('/', 1)
+                #     msg.add_attachment(pdf_data, maintype=maintype, subtype=subtype, filename='StudentData.pdf')
                     
 
                 with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
@@ -158,6 +158,6 @@ def validateotp(rollno):
 @main.route("/endpage", methods=['GET'])
 def endpage():
     #Delete the generated pdf after sending email
-    removePdf()
+    # removePdf()
     return render_template("endpage.html",message="Check your Email for the result")
 
