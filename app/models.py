@@ -10,3 +10,4 @@ class Student(db.Model):
     english_marks = db.Column(db.Integer())
 
 
+db.create_all()
