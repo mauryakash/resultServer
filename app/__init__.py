@@ -3,7 +3,7 @@ from .extensions import db
 from .students_views import main
 from .admin_views import main2,admin
 
-def app(config_file='settings.py'):
+def create_app(config_file='settings.py'):
     app = Flask(__name__)
     
     app.config.from_pyfile(config_file)
