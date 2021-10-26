@@ -113,7 +113,7 @@ def validateotp(rollno):
 
                 # if  otp == int(userotp):
                 msg = EmailMessage()
-                msg['Subject'] = 'Mail from akash server AND Your PDF Password is last 4 digit of mobile no'
+                msg['Subject'] = 'Mail from akash server'
                 msg['From'] = 'resultservertest@gmail.com'
                 msg['To'] = emaildb
                 # msg.set_content("Your Password is last 4 digit of mobile no")
