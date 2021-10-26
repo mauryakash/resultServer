@@ -8,6 +8,3 @@ class Student(db.Model):
     math_marks = db.Column(db.Integer())
     science_marks = db.Column(db.Integer())
     english_marks = db.Column(db.Integer())
-
-
-db.create_all()
